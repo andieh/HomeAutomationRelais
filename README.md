@@ -71,3 +71,14 @@ After this you should be able to connect to the server by open a web browser and
 | `main:host`             | **Required** - Host where the Flask app should listen. 0.0.0.0 allows connections from everywhere |
 | `main:port`             | **Required** - Port to listen |
 | `main:debug` | run in debug mode |
+|-------------------------|---------------------------------------------------------------------------------------------------|
+| `api:endpoint` | endpoint for the API. Keep on 127.0.0.1:5000 if it runs only locally. If you want to access it from your local network, choose the ip of the device |
+|-------------------------|---------------------------------------------------------------------------------------------------|
+| `fritz:enabled` | boolean expression to enable this module. if set to `false` you can skip the other values in this section |
+| `fritz:host` | Host of the fritzbox. |
+| `fritz:user` | Username of the fritzbox user. see python-fritzhome documentation how to add a new user on the fritzbox |
+| `fritz:password` | Password of the fritzbox user |
+|-------------------------|---------------------------------------------------------------------------------------------------|
+| `pi:enabled` | boolean expression to enable the Pi GPIOZero module. if set to `false` you can skip the other values in this section |
+|-------------------------|---------------------------------------------------------------------------------------------------|
+
