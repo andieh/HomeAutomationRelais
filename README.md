@@ -14,8 +14,8 @@ Behind the scenes all functionalites are packed into threads, which is maybe not
 While the python-fritzhome package provides many more devices, i'm focussing here on the following devices since i do not have more devices yet. 
 Feel free to contribute error / display / api functions for missing devices
 
-* `FRITZ!DECT 200`_
-* `Comet DECT`_
+* [FRITZ!DECT 200](https://avm.de/produkte/fritzdect/fritzdect-200/)
+* [Comet DECT](https://www.eurotronic.org/produkte/comet-dect.html)
 
 ### Example
 --------------
@@ -69,9 +69,5 @@ After this you should be able to connect to the server by open a web browser and
 | Option                  | Details                                                                                           |
 |-------------------------|---------------------------------------------------------------------------------------------------|
 | `main:host`             | **Required** - Host where the Flask app should listen. 0.0.0.0 allows connections from everywhere |
-
-### References
---------------
-
-.. _Comet DECT: https://www.eurotronic.org/produkte/comet-dect.html
-.. _FRITZ!DECT 200: https://avm.de/produkte/fritzdect/fritzdect-200/
+| `main:port`             | **Required** - Port to listen |
+| `main:debug` | run in debug mode |
