@@ -22,7 +22,7 @@ Feel free to contribute error / display / api functions for missing devices
 ![Example Screenshot](static/sample.png?raw=true "Example screenshot")
 
 ### Installation
-
+--------------
 Use a virtual environment to install all requirements
 
 ```python
@@ -64,6 +64,13 @@ python3 webapp.py
 After this you should be able to connect to the server by open a web browser and browse to `http://localhost:5000`. See the configuration options section for more options.
 
 ### Configuration Options
+--------------
+
+| Option                  | Details                                                                                           |
+|-------------------------|---------------------------------------------------------------------------------------------------|
+| `main:host`             | **Required** - Host where the Flask app should listen. 0.0.0.0 allows connections from everywhere |
+
+### References
 --------------
 
 .. _Comet DECT: https://www.eurotronic.org/produkte/comet-dect.html
