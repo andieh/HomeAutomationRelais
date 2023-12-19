@@ -1,166 +1,6 @@
 <!doctype html>
 <title>Pi Home Assist</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
-<style>
-span.img {
-    display: block;
-}
-
-img.image {
-    margin-top: 10px;
-    width: 70px;
-}
-
-span.dimmed {
-    color: #666;
-    font-size: 1.0rem;
-    line-height: 1.25;
-}
-span.window-open {
-    color: #111;
-    font-size: 0.7rem;
-    font-weight: bold;
-    border-radius: 5px;
-    padding: 2px;
-    background: #999;
-    border-color: #555;
-}
-span.error {
-  text-transform: uppercase;
-  font-weight: bold;
-  color: #666;
-}
-
-span.header {
-  display: block;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  font-family: Roboto Condensed, Arial, Helvetica, sans-serif;
-  font-weight: 400;
-  border-bottom: 1px solid #666;
-  line-height: 15px;
-  padding-bottom: 5px;
-  margin-bottom: 10px;
-  color: #999;
-  text-align: right;
-  width: 465px;
-}
-span.name {
-  line-height: 15px;
-  text-transform: uppercase;
-}
-.img-container {
-  position: relative;
-  text-align: center;
-  width: 50px;
-  color: #666;
-}
-.text-on-image {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-weight: bold;
-  transform: translate(-50%, -50%);
-}
-body {
-  background-color: black;
-  color: white;
-  font-family: Roboto Condensed, Arial, Helvetica, sans-serif;
-}
-p {
-    #border-style: solid;
-    #border-color: white;
-    #border-radius: 10px;
-    padding: 10px;
-}
-div.header {
-  border-bottom: 1px solid #666;
-}
-
-.float-container {
-    border: 2px solid #999;
-    border-radius: 10px;
-    padding: 5px;
-    width: 450px;
-    height: 50px;
-    margin-top: 3px;
-    display: block;
-}
-
-.error-msg {
-  display: inline-block;
-  text-transform: none;
-  color: #666;
-}
-.switch-left {
-  float: left;
-  width: 50px;
-  padding-right: 5px;
-}
-.switch-middle {
-  float: left;
-  width: 275px;
-  height: 100%;
-  padding-left: 5px;
-  border-left: 1px solid #666;
-  padding-top: 5px;
-}
-.switch-right {
-  float: left;
-  width: 110px;
-  height: 100%;
-  padding-top: 5px;
-  text-align: right;
-}
-
-.thermostat-left {
-  float: left;
-  width: 160px;
-  padding-right: 5px;
-}
-.thermostat-middle {
-  float: left;
-  width: 165px;
-  height: 100%;
-  padding-left: 5px;
-  border-left: 1px solid #666;
-  padding-top: 5px;
-}
-.thermostat-right {
-  float: left;
-  width: 110px;
-  height: 100%;
-  padding-top: 5px;
-  text-align: right;
-}
-
-.pi-left {
-  float: left;
-  width: 100%;
-  padding-right: 5px;
-}
-
-.img-button {
-  width:50px;
-}
-.info-first {
-  display: block;
-  text-transform: uppercase;
-  color: #999;
-  font-weight: bold;
-}
-.info-second {
-  display: inline-block;
-  color: #666;
-}
-.info-temp {
-  color: #999;
-  font-size: 2rem;
-  #font-weight: bold;
-}
-
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
 <span class="header">Homeautomation</span>
 {% if not fh %}
 Not configured 
@@ -273,9 +113,9 @@ const onError = function(name, data) {
     document.getElementById(name+"_off").setAttribute("src", "/static/atb-error.png");
     document.getElementById(name+"_eco").setAttribute("src", "/static/atb-error.png");
     document.getElementById(name+"_com").setAttribute("src", "/static/atb-error.png");
-
     document.getElementById(name+"_error").innerHTML = data["msg"];
     document.getElementById(name+"_info").style.visibility = "hidden";
+    document.getElementById(name+"_temp").innerHTML = "?";
     document.getElementById(name+"_wo").style.visibility = "hidden";
   } else if (data["category"] == "FRITZ!DECT 200") {
     document.getElementById(name+"_switch").setAttribute("src", "/static/atb-error.png");
@@ -315,7 +155,6 @@ const fetchData = async (name) => {
     document.getElementById(name+"_off").setAttribute("src", "/static/atb-off-" + n + ".png");
     //n = (target == 127.0) ? "on" : "off"; 
     //document.getElementById(name+"_on").setAttribute("src", "/static/atb-on-" + n + ".png");
-    document.getElementById(name+"_error").style.visibility = "hidden";
     document.getElementById(name+"_error").innerHTML = "";
     document.getElementById(name+"_info").style.visibility = "visible";
     document.getElementById(name+"_temp").innerHTML = myJson["temperature"];
@@ -323,7 +162,6 @@ const fetchData = async (name) => {
     document.getElementById(name+"_bat").innerHTML = myJson["battery"];
     document.getElementById(name+"_wo").style.visibility = myJson["window_open"] ? "visible" : "hidden";
   } else if (myJson["category"] == "FRITZ!DECT 200") {
-    document.getElementById(name+"_error").style.visibility = "hidden";
     document.getElementById(name+"_error").innerHTML = "";
     document.getElementById(name+"_info").style.visibility = "visible";
     document.getElementById(name+"_temp").innerHTML = myJson["temperature"];
