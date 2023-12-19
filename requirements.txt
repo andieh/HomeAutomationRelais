@@ -1,0 +1,6 @@
+flask
+flask-cors
+
+pyfritzhome
+# for secure https
+#cryptography
