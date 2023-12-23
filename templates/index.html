@@ -9,6 +9,10 @@ Not configured
   <img class="img-button" src="/static/atb-off-off.png" onClick="setTemp('all', 'off');">
   <img class="img-button" src="/static/atb-eco-off.png" onClick="setTemp('all', 'eco');">
   <img class="img-button" src="/static/atb-com-off.png" onClick="setTemp('all', 'comfort');">
+  {% if config.fritz.enabled and config.fritz.away != "disabled" %}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <img id="away_img" class="img-button" src="/static/atb-away-off.png" onClick="setTemp('all', 'away');">
+  {% endif %}
 </div>
 
 {% for d in fh.get_devices() %}
@@ -91,7 +95,7 @@ Not configured
 <script>
 
 const fetchPiData = async (name) => {
-    const response = await fetch('{{ api_endpoint }}/pi_get?name='+name, {
+    const response = await fetch('{{ config["api"]["endpoint"] }}/pi_get?name='+name, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -118,7 +122,7 @@ const fetchPiData = async (name) => {
 }
 
 const piPressed = async (name) => {
-    const response = await fetch('{{ api_endpoint }}/pi_pressed', {
+    const response = await fetch('{{ config["api"]["endpoint"] }}/pi_pressed', {
     method: 'POST',
     body: JSON.stringify({"name": name}),
     headers: {
@@ -131,7 +135,7 @@ const piPressed = async (name) => {
 }
 
 const toggleSwitch = async (name) => {
-    const response = await fetch('{{ api_endpoint }}/toggle', {
+    const response = await fetch('{{ config["api"]["endpoint"] }}/toggle', {
     method: 'POST',
     body: JSON.stringify({"name": name}),
     headers: {
@@ -144,8 +148,8 @@ const toggleSwitch = async (name) => {
 }
 
 const setTemp = async (name, temp) => {
-  console.log("set device '" + name + "' to '" + temp);
-    const response = await fetch('{{ api_endpoint }}/temp', {
+  console.log("set device '" + name + "' to '" + temp + "'");
+    const response = await fetch('{{ config["api"]["endpoint"] }}/temp', {
     method: 'POST',
     body: JSON.stringify({"name": name, "temp": temp}),
     headers: {
@@ -176,7 +180,7 @@ const onError = function(name, data) {
 }
 
 const fetchData = async (name) => {
-    const response = await fetch('{{ api_endpoint }}/get?name='+name, {
+    const response = await fetch('{{ config["api"]["endpoint"] }}/get?name='+name, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
@@ -188,7 +192,9 @@ const fetchData = async (name) => {
       return;
   }
   const myJson = await response.json(); //extract JSON from the http response
-  if (myJson["status"] != "ok") {
+  var an = (myJson["away"] == "no") ? "off" : "on";
+  document.getElementById("away_img").setAttribute("src", "/static/atb-away-" + an + ".png");
+  if (myJson["status"] !== "ok") {
     onError(name, myJson);
     return;
   } else if (myJson["category"] == "Comet DECT") {

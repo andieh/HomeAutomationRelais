@@ -14,6 +14,7 @@ class FritzHome(Thread):
         self._host = host
         self._user = user
         self._pass = password
+        self._away = None
         self._check_interval_s = 1 
         self._check_devices_every_s = 10
         self._login_timeout_s = 5
@@ -46,6 +47,9 @@ class FritzHome(Thread):
     def stop(self):
         log.debug("stopping to check for FritzHome Devices")
         self._running = False
+
+    def get_away_mode(self):
+        return self._away
 
     def run(self):
         while self._running:
@@ -90,6 +94,16 @@ class FritzHome(Thread):
         self.fha.set_target_temperature(dev["ain"], temp)
         self.fetch_data()
 
+    def toggle_away_mode(self, temp):
+        if self._away:
+            log.info("disable away mode")
+            self._away = None
+            return True
+
+        log.info("enable away mode")
+        self._away = temp
+        return True
+
     def get_device(self, name):
         if name in self.devices:
             return self.devices[name]
@@ -125,6 +139,8 @@ class FritzHome(Thread):
 
             self.devices[name]["ain"] = ain
             self.devices[name]["category"] = product
+            self.devices[name]["away"] = self._away if self._away else "no"
+
             if not dev.present:
                 self.devices[name]["status"] = "unavailable"
                 self.devices[name]["msg"] = "device not reachable"

@@ -25,6 +25,7 @@ def init_webapp(cfg):
         fh = None
     app.config["fritz"] = fh
 
+    # if requested, try to enable Pi related stuff
     if cfg["pi"]["enabled"]:
         try:
             from core.Pi import PiDevices
@@ -42,6 +43,8 @@ def init_webapp(cfg):
     else: 
         pi = None
     app.config["pi"] = pi
+
+    app.config["config"] = cfg
 
     with app.app_context():
         if app.config["fritz"]:
@@ -67,7 +70,7 @@ def entry_point():
     return render_template("index.html", \
             fh=app.config["fritz"], 
             pi=app.config["pi"], 
-            api_endpoint=cfg["api"]["endpoint"])
+            config=app.config["config"])
 
 @app.route("/toggle", methods=["POST"])
 @cross_origin()
@@ -126,6 +129,13 @@ def set_temp():
         names = fh.get_devices()
     else:
         names = [name]
+
+    if (temp == "away"):
+        if cfg["fritz"]["away"] == "disabled":
+            log.error("requesting away mode, but its disabled in the config file, aborting")
+            return jsonify("away mode disabled"), 500
+        fh.toggle_away_mode(cfg["fritz"]["away"])
+        return jsonify("enabled away mode"), 200
 
     for name in names:
         dev = fh.get_device(name)
