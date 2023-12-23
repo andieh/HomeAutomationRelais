@@ -1,6 +1,16 @@
 flask
 flask-cors
-
-pyfritzhome
 # for secure https
 #cryptography
+
+# if you want to have a connection to fritz home automation devices
+pyfritzhome
+
+# if you want to run this on an raspberry pi
+gpiozero
+lgpio
+# or alternatively 
+#rpi.gpio
+
+
+

@@ -2,7 +2,7 @@
 from flask import Flask
 from flask import request, jsonify, make_response
 from flask import render_template
-from flask_cors import cross_origin
+from flask_cors import cross_origin, CORS
 
 from core.utils.Log import log
 
@@ -33,6 +33,12 @@ def init_webapp(cfg):
             log.error("failed to init pi devices. is gpiozero installed?")
             log.error(str(e))
             pi = None
+
+        # add devices
+        if pi:
+            for gadget_def in cfg["pi"]["gadgets"]:
+                pi.add_gadget(gadget_def)
+            
     else: 
         pi = None
     app.config["pi"] = pi
@@ -51,17 +57,17 @@ if not os.path.exists(config):
 
 with open(config, "r") as configfile:
     cfg = json.load(configfile)
-    print("read config from {}".format(config))
-    print(cfg)
+    log.debug("read config from {}".format(config))
 
 app = init_webapp(cfg)  
+CORS(app)
 
 @app.route("/")
 def entry_point():
     return render_template("index.html", \
             fh=app.config["fritz"], 
             pi=app.config["pi"], 
-            api_endpoint="http://192.168.0.187:5000")
+            api_endpoint=cfg["api"]["endpoint"])
 
 @app.route("/toggle", methods=["POST"])
 @cross_origin()
@@ -85,6 +91,23 @@ def toggle_switch():
     fh.set_switch(name, new_state)
 
     return jsonify(new_state), 200
+
+@app.route("/pi_pressed", methods=["POST"])
+@cross_origin()
+def pi_pressed():
+    pi = app.config["pi"]
+    if pi is None:
+        return jsonify("Pi not available / enabled"), 404
+    body = request.json
+    if not "name" in body:
+        return jsonify("name not set"), 404
+
+    gadget = pi.get_gadget(body["name"])
+    if not gadget:
+        return jsonify("unknown gadget with name '{}'".format(name))
+    
+    res = pi.do_action(body["name"])
+    return jsonify(res), 200
 
 @app.route("/temp", methods=["POST"])
 @cross_origin()
@@ -153,6 +176,20 @@ def get_fritz():
         return jsonify("device not found"), 404
 
     return jsonify(dev), 200
+
+@app.route("/pi_get", methods=["GET"])
+@cross_origin()
+def get_pi():
+    name = request.args.get("name")
+    pi = app.config["pi"]
+    if pi is None:
+        return jsonify("Pi not available / enabled"), 404
+    if name is None:
+        return jsonify({"gadgets": pi.get_gadgets()}), 200
+    gadget = pi.get_gadget(name)
+    if not gadget:
+        return jsonify("gadget not found"), 404
+    return jsonify(gadget), 200
 
 if __name__ == "__main__":
     app.run(debug=cfg["main"]["debug"], host=cfg["main"]["host"], port=cfg["main"]["port"], use_reloader=False)#, ssl_context="adhoc")

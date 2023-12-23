@@ -71,16 +71,64 @@ Not configured
 {% else %}
 <div class="float-container">
     <div class="pi-left">
-        <img class="img-button" src="/static/atb-toilet-off.png"/>
+	{% for g in pi.get_gadgets() %}
+	<img class="img-button" src="/static/atb-{{ g }}-off.png" id="{{ g }}_img" onClick="piPressed('{{ g }}');"/>
+	<script>
+	var {{ d }}_checker = window.setInterval(function(){
+		fetchPiData("{{ g }}");
+	}, 1000);
+	</script>
+	{% endfor %}
+        <!--img class="img-button" src="/static/atb-toilet-off.png"/>
         <img class="img-button" src="/static/atb-power-off.png"/>
         <img class="img-button" src="/static/atb-slideshow-on.png"/>
         <img class="img-button" src="/static/atb-calendar-off.png"/>
-        <img class="img-button" src="/static/atb-movement-off.png"/>
+        <img class="img-button" src="/static/atb-movement-off.png"/-->
     </div>
 </div>
 {% endif %}
 
 <script>
+
+const fetchPiData = async (name) => {
+    const response = await fetch('{{ api_endpoint }}/pi_get?name='+name, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
+  if (response.status != 200) {
+      console.log("pi: error retrieving data")
+      console.log(response)
+      return;
+  }
+  const myJson = await response.json(); //extract JSON from the http response
+  if (myJson["status"] != "ok") {
+    //onError(name, myJson);
+    return;
+  }
+
+  console.log(myJson);
+  if (myJson["category"] == "PWMLED") {
+    var n = myJson["pulsing"] ? "on" : "off"; 
+    document.getElementById(name+"_img").setAttribute("src", "/static/atb-"+name+"-"+n+".png");
+  } else {
+    console.log("unknown category " + myJson["category"]);
+  }
+}
+
+const piPressed = async (name) => {
+    const response = await fetch('{{ api_endpoint }}/pi_pressed', {
+    method: 'POST',
+    body: JSON.stringify({"name": name}),
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
+  });
+  const resp = await response.json(); //extract JSON from the http response
+  console.log("receive response " + resp);
+}
 
 const toggleSwitch = async (name) => {
     const response = await fetch('{{ api_endpoint }}/toggle', {
