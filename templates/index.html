@@ -87,7 +87,7 @@ Not configured
 <script>
 
 const toggleSwitch = async (name) => {
-    const response = await fetch('{{ api_endpoint }}/toggle', {
+    const response = await fetch('{{ url_for("toggle_switch") }}', {
     method: 'POST',
     body: JSON.stringify({"name": name}),
     headers: {
@@ -101,7 +101,7 @@ const toggleSwitch = async (name) => {
 
 const setTemp = async (name, temp) => {
   console.log("set device '" + name + "' to '" + temp + "'");
-    const response = await fetch('{{ api_endpoint }}/temp', {
+    const response = await fetch('{{ url_for("set_temp") }}', {
     method: 'POST',
     body: JSON.stringify({"name": name, "temp": temp}),
     headers: {
@@ -132,7 +132,7 @@ const onError = function(name, data) {
 }
 
 const fetchData = async (name) => {
-    const response = await fetch('{{ api_endpoint }}/get?name='+name, {
+    const response = await fetch('{{ url_for("get_fritz") }}?name='+name, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'
