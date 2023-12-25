@@ -46,6 +46,7 @@ def init_webapp(cfg):
 
     app.config["config"] = cfg
 
+    log.debug("inited all devices, create app")
     with app.app_context():
         if app.config["fritz"]:
             app.config["fritz"].start()

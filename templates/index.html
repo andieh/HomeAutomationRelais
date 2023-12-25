@@ -76,7 +76,7 @@ Not configured
 <div class="float-container">
     <div class="pi-left">
 	{% for g in pi.get_gadgets() %}
-	<img class="img-button" src="/static/atb-{{ g }}-off.png" id="{{ g }}_img" onClick="piPressed('{{ g }}');"/>
+	<img class="img-button" src="/static/{{ g }}-off.png" id="{{ g }}_img" onClick="piPressed('{{ g }}');"/>
 	<script>
 	var {{ d }}_checker = window.setInterval(function(){
 		fetchPiData("{{ g }}");
@@ -112,10 +112,12 @@ const fetchPiData = async (name) => {
     return;
   }
 
-  console.log(myJson);
   if (myJson["category"] == "PWMLED") {
     var n = myJson["pulsing"] ? "on" : "off"; 
-    document.getElementById(name+"_img").setAttribute("src", "/static/atb-"+name+"-"+n+".png");
+    document.getElementById(name+"_img").setAttribute("src", "/static/" + name+"-"+n+".png");
+  } else if (myJson["category"] == "LED") {
+    var n = myJson["state"] ? "on" : "off"; 
+    document.getElementById(name+"_img").setAttribute("src", "/static/"+name+"-"+n+".png");
   } else {
     console.log("unknown category " + myJson["category"]);
   }

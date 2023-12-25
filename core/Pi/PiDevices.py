@@ -1,10 +1,10 @@
 from threading import Thread
 import time
 from datetime import datetime, timedelta
-from gpiozero import PWMLED
 
 from core.utils.Log import log
 
+from gpiozero import PWMLED
 class HARPwmLed(Thread):
     def __init__(self, port):
         Thread.__init__(self)
@@ -40,20 +40,71 @@ class HARPwmLed(Thread):
         log.debug("HARPwmLed: start checking")
         while self._running:
             if self._on and not self._pulsing:
-                print("start pulsing")
+                log.debug("start pulsing")
                 if self._led is None:
                     self._led = PWMLED(self._port)
                 self._led.pulse()
                 self._pulsing = True
 
             elif not self._on and self._pulsing:
-                print("stop pulsing")
+                log.debug("stop pulsing")
                 self._led.close()
                 self._led = None
                 self._pulsing = False
 
             time.sleep(0.1)
 
+from gpiozero import LED
+class HARLed(Thread):
+    def __init__(self, port):
+        Thread.__init__(self)
+        self._port = port
+        self._led = None
+        self._on = False
+        self._request = False
+        self._running = True
+        self._device = LED(port, active_high=False, initial_value=None)
+
+    def on(self):
+        self._on = True
+        self._request = True
+
+    def off(self):
+        self._on = False
+        self._request = True
+
+    def toggle(self):
+        if self.get_state():
+            self.off()
+        else:
+            self.on()
+
+    def exit(self):
+        self._running = False
+
+    def get_state(self):
+        return self._on
+
+    def get_info(self):
+        return {
+            "state": self._on
+            }
+    def is_running(self):
+        return self._running
+
+    def run(self):
+        log.debug("HARPwmLed: start checking")
+        while self._running:
+            if self._request and self._on:
+                log.debug("enable LED")
+                self._device.on()
+
+            elif self._request and not self._on:
+                log.debug("disable LED")
+                self._device.off()
+            
+            self._request = False
+            time.sleep(0.1)
 
 class PiDevices(Thread):
     def __init__(self):
@@ -62,13 +113,7 @@ class PiDevices(Thread):
 
         self._gadgets = {}
         self._check_interval_s = 1 
-        self._init()
         self._running = True
-
-    def _init(self):
-        # init devices
-        self.shit = HARPwmLed(5)
-        self.shit.start()
 
     def add_gadget(self, definition):
         name = definition["name"] if "name" in definition else None
@@ -90,6 +135,11 @@ class PiDevices(Thread):
                 log.error("no port configured for {}".format(name))
                 return False
             obj = HARPwmLed(definition["port"])
+        elif category == "LED":
+            if not "port" in definition:
+                log.error("no port configured for {}".format(name))
+                return False
+            obj = HARLed(definition["port"])
         else:
             log.error("unknown category '{}' for gadget with name '{}'".format(category, name))
             return False

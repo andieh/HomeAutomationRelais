@@ -8,9 +8,9 @@ pyfritzhome
 
 # if you want to run this on an raspberry pi
 gpiozero
-lgpio
+rpi.gpio
 # or alternatively 
-#rpi.gpio
+lgpio
 
 
 
