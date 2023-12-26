@@ -2,6 +2,7 @@ from threading import Thread
 import time
 from datetime import datetime, timedelta
 from core.Pi.HARLed import HARLed
+from core.Pi.HARPir import HARPir
 from core.Pi.HARPwmLed import HARPwmLed
 from core.utils.Log import log
 
@@ -39,6 +40,8 @@ class PiDevices(Thread):
                 log.error("no port configured for {}".format(name))
                 return False
             obj = HARLed(definition)
+        elif category == "PIR":
+            obj = HARPir(definition)
         else:
             log.error("unknown category '{}' for gadget with name '{}'".format(category, name))
             return False
