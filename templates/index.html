@@ -113,10 +113,10 @@ const fetchPiData = async (name) => {
   }
 
   if (myJson["category"] == "PWMLED") {
-    var n = myJson["pulsing"] ? "on" : "off"; 
+    var n = myJson["active"] ? "on" : "off"; 
     document.getElementById(name+"_img").setAttribute("src", "/static/" + name+"-"+n+".png");
   } else if (myJson["category"] == "LED") {
-    var n = myJson["state"] ? "on" : "off"; 
+    var n = myJson["active"] ? "on" : "off"; 
     document.getElementById(name+"_img").setAttribute("src", "/static/"+name+"-"+n+".png");
   } else {
     console.log("unknown category " + myJson["category"]);
