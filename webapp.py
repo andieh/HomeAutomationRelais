@@ -69,8 +69,10 @@ CORS(app)
 @app.route("/")
 def entry_point():
     return render_template("index.html", \
-            fh=app.config["fritz"], 
-            pi=app.config["pi"], 
+            fh=app.config["fritz"].get_devices(),
+            pi=app.config["pi"].get_gadgets(),
+            endpoint="", 
+            env="main", 
             config=app.config["config"])
 
 @app.route("/toggle", methods=["POST"])
@@ -175,7 +177,7 @@ def get_fritz():
     if fh is None:
         return jsonify("Fritz not available / enabled"), 404
     if not (ain or name):
-        return jsonify({"devices": fh.get_devices()}), 200
+        return jsonify(fh.get_devices()), 200
     
     if ain:
         name = fh.get_name_by_ain(ain)
@@ -196,7 +198,7 @@ def get_pi():
     if pi is None:
         return jsonify("Pi not available / enabled"), 404
     if name is None:
-        return jsonify({"gadgets": pi.get_gadgets()}), 200
+        return jsonify(pi.get_gadgets()), 200
     gadget = pi.get_gadget(name)
     if not gadget:
         return jsonify("gadget not found"), 404

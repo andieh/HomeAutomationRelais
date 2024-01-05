@@ -1,6 +1,10 @@
 <!doctype html>
 <title>Pi Home Assist</title>
+
+{% if env == "main" %}
 <link rel="stylesheet" href="{{ url_for('static', filename='styles/main.css') }}">
+{% endif %}
+
 <span class="header">Homeautomation</span>
 {% if not fh %}
 Not configured 
@@ -10,13 +14,12 @@ Not configured
   <img class="img-button" src="/static/atb-eco-off.png" onClick="setTemp('all', 'eco');">
   <img class="img-button" src="/static/atb-com-off.png" onClick="setTemp('all', 'comfort');">
   {% if config.fritz.enabled and config.fritz.away != "disabled" %}
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   <img id="away_img" class="img-button" src="/static/atb-away-off.png" onClick="setTemp('all', 'away');">
   {% endif %}
 </div>
 
-{% for d in fh.get_devices() %}
-{% set dev = fh.get_device(d) %}
+{% for d, dev in fh.items() %}
 {% if dev["category"] == "FRITZ!DECT 200" %}
 <div class="float-container" id="{{ d }}_main">
     <div class="switch-left">
@@ -75,19 +78,14 @@ Not configured
 {% else %}
 <div class="float-container">
     <div class="pi-left">
-	{% for g in pi.get_gadgets() %}
-	<img class="img-button" src="/static/{{ g }}-off.png" id="{{ g }}_img" onClick="piPressed('{{ g }}');"/>
+	{% for name, gadget in pi.items() %}
+	<img class="img-button" src="/static/{{ name }}-off.png" id="{{ name }}_img" onClick="piPressed('{{ name }}');"/>
 	<script>
-	var {{ d }}_checker = window.setInterval(function(){
-		fetchPiData("{{ g }}");
+	var {{ name }}_checker = window.setInterval(function(){
+		fetchPiData("{{ name }}");
 	}, 1000);
 	</script>
 	{% endfor %}
-        <!--img class="img-button" src="/static/atb-toilet-off.png"/>
-        <img class="img-button" src="/static/atb-power-off.png"/>
-        <img class="img-button" src="/static/atb-slideshow-on.png"/>
-        <img class="img-button" src="/static/atb-calendar-off.png"/>
-        <img class="img-button" src="/static/atb-movement-off.png"/-->
     </div>
 </div>
 {% endif %}
@@ -118,13 +116,16 @@ const fetchPiData = async (name) => {
   } else if (myJson["category"] == "LED") {
     var n = myJson["active"] ? "on" : "off"; 
     document.getElementById(name+"_img").setAttribute("src", "/static/"+name+"-"+n+".png");
+  } else if (myJson["category"] == "PIR") {
+    var n = myJson["active"] ? "on" : "off"; 
+    document.getElementById(name+"_img").setAttribute("src", "/static/"+name+"-"+n+".png");
   } else {
-    console.log("unknown category " + myJson["category"]);
+    console.log("unknown PI category " + myJson["category"]);
   }
 }
 
 const piPressed = async (name) => {
-    const response = await fetch('{{ url_for("pi_pressed") }}', {
+    const response = await fetch('{{ endpoint }}/pi_pressed', {
     method: 'POST',
     body: JSON.stringify({"name": name}),
     headers: {
@@ -137,7 +138,7 @@ const piPressed = async (name) => {
 }
 
 const toggleSwitch = async (name) => {
-    const response = await fetch('{{ url_for("toggle_switch") }}', {
+    const response = await fetch('{{ endpoint }}/toggle', {
     method: 'POST',
     body: JSON.stringify({"name": name}),
     headers: {
@@ -151,7 +152,7 @@ const toggleSwitch = async (name) => {
 
 const setTemp = async (name, temp) => {
   console.log("set device '" + name + "' to '" + temp + "'");
-    const response = await fetch('{{ url_for("set_temp") }}', {
+    const response = await fetch('{{ endpoint }}/temp', {
     method: 'POST',
     body: JSON.stringify({"name": name, "temp": temp}),
     headers: {
@@ -182,7 +183,7 @@ const onError = function(name, data) {
 }
 
 const fetchData = async (name) => {
-    const response = await fetch('{{ url_for("get_fritz") }}?name='+name, {
+    const response = await fetch('{{ endpoint }}/get?name='+name, {
     method: 'GET',
     headers: {
       'Content-Type': 'application/json'

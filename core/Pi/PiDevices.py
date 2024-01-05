@@ -58,7 +58,7 @@ class PiDevices(Thread):
         return self._gadgets[name]["obj"].get_state()
 
     def get_gadgets(self):
-        return list(self._gadgets.keys())
+        return {x: self.get_gadget(x) for x in self._gadgets}
 
     def do_action(self, name):
         gadget = self._gadgets[name]

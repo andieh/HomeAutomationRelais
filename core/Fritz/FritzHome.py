@@ -79,7 +79,7 @@ class FritzHome(Thread):
             
 
     def get_devices(self):
-        return list(self.devices.keys())
+        return self.devices
 
     def set_switch(self, name, state):
         dev = self.get_device(name)
